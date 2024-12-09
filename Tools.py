@@ -5,6 +5,7 @@ import plotly.express as px
 from typing import Tuple, Optional
 import soundfile as sf
 
+
 def load_audio(file_path: str) -> Tuple[np.ndarray, int]:
     """
     Load audio file and return signal data with sampling rate.
@@ -25,6 +26,7 @@ def load_audio(file_path: str) -> Tuple[np.ndarray, int]:
     except Exception as e:
         raise ValueError(f"Error loading audio file: {str(e)}")
 
+
 def save_audio(file_path: str, audio_data: np.ndarray, sample_rate: int) -> None:
     """
     Save audio data to WAV file.
@@ -43,7 +45,10 @@ def save_audio(file_path: str, audio_data: np.ndarray, sample_rate: int) -> None
     except Exception as e:
         raise ValueError(f"Error saving audio file: {str(e)}")
 
-def visualize_signal(audio_data: np.ndarray, sample_rate: int, title: Optional[str] = "Audio Signal") -> None:
+
+def visualize_signal(
+    audio_data: np.ndarray, sample_rate: int, title: Optional[str] = "Audio Signal"
+) -> None:
     """
     Plot audio signal in time domain using Plotly.
 
@@ -54,9 +59,12 @@ def visualize_signal(audio_data: np.ndarray, sample_rate: int, title: Optional[s
     """
     time = np.arange(len(audio_data)) / sample_rate
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=time, y=audio_data, mode='lines', name='Audio Signal'))
-    fig.update_layout(title=title, xaxis_title='Time (seconds)', yaxis_title='Amplitude')
+    fig.add_trace(go.Scatter(x=time, y=audio_data, mode="lines", name="Audio Signal"))
+    fig.update_layout(
+        title=title, xaxis_title="Time (seconds)", yaxis_title="Amplitude"
+    )
     fig.show()
+
 
 def DFT(audio_data: np.ndarray, sample_rate: int) -> Tuple[np.ndarray, np.ndarray]:
     """
@@ -73,7 +81,12 @@ def DFT(audio_data: np.ndarray, sample_rate: int) -> Tuple[np.ndarray, np.ndarra
     spectrum = np.abs(np.fft.rfft(audio_data))
     return frequencies, spectrum
 
-def visualize_spectrum(audio_data: np.ndarray, sample_rate: int, title: Optional[str] = "Frequency Spectrum") -> None:
+
+def visualize_spectrum(
+    audio_data: np.ndarray,
+    sample_rate: int,
+    title: Optional[str] = "Frequency Spectrum",
+) -> None:
     """
     Plot audio spectrum in frequency domain using Plotly.
 
@@ -84,11 +97,19 @@ def visualize_spectrum(audio_data: np.ndarray, sample_rate: int, title: Optional
     """
     frequencies, spectrum = DFT(audio_data, sample_rate)
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=frequencies, y=spectrum, mode='lines', name='Spectrum'))
-    fig.update_layout(title=title, xaxis_title='Frequency (Hz)', yaxis_title='Magnitude', yaxis_type='log')
+    fig.add_trace(go.Scatter(x=frequencies, y=spectrum, mode="lines", name="Spectrum"))
+    fig.update_layout(
+        title=title,
+        xaxis_title="Frequency (Hz)",
+        yaxis_title="Magnitude",
+        yaxis_type="log",
+    )
     fig.show()
 
-def STFT(audio_data: np.ndarray, sample_rate: int, window_size: int, hop_size: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+
+def STFT(
+    audio_data: np.ndarray, sample_rate: int, window_size: int, hop_size: int
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Compute the Short-Time Fourier Transform (STFT) of the audio signal.
 
@@ -99,14 +120,60 @@ def STFT(audio_data: np.ndarray, sample_rate: int, window_size: int, hop_size: i
         hop_size (int): Hop size between successive windows
 
     Returns:
-        Tuple[np.ndarray, np.ndarray, np.ndarray]: Times, frequencies, and STFT magnitudes
+        - Times (np.ndarray): 1D array of time points at which STFT is computed.
+        - Frequencies (np.ndarray): 1D array of frequency bins for the STFT.
+        - STFT Magnitudes (np.ndarray): 2D array of STFT magnitudes with rows as frequency bins and columns as time points.
     """
     from scipy.signal import stft
-    frequencies, times, Zxx = stft(audio_data, fs=sample_rate, nperseg=window_size, noverlap=window_size - hop_size)
+
+    frequencies, times, Zxx = stft(
+        audio_data, fs=sample_rate, nperseg=window_size, noverlap=window_size - hop_size
+    )
     stft_magnitudes = np.abs(Zxx)
     return times, frequencies, stft_magnitudes
 
-def spectrogram_stft(audio_data: np.ndarray, sample_rate: int, window_size: int, hop_size: int, title: Optional[str] = "Spectrogram (STFT)", log_scale: bool = False) -> None:
+
+def plot_spectrogram(
+    times: np.ndarray,
+    frequencies: np.ndarray,
+    stft_magnitudes: np.ndarray,
+    title: Optional[str] = "Spectrogram",
+    log_scale: bool = False,
+) -> None:
+    """
+    Plot the spectrogram from STFT output using Plotly.
+
+    Args:
+        times (np.ndarray): 1D array of time points at which STFT is computed.
+        frequencies (np.ndarray): 1D array of frequency bins for the STFT.
+        stft_magnitudes (np.ndarray): 2D array of STFT magnitudes with rows as frequency bins and columns as time points.
+        title (str, optional): Plot title
+        log_scale (bool, optional): Whether to display the frequency axis in log scale
+    """
+    fig = px.imshow(
+        20 * np.log10(stft_magnitudes),
+        x=times,
+        y=frequencies,
+        origin="lower",
+        aspect="auto",
+        color_continuous_scale="viridis",
+    )
+    fig.update_layout(
+        title=title, xaxis_title="Time (seconds)", yaxis_title="Frequency (Hz)"
+    )
+    if log_scale:
+        fig.update_yaxes(type="log")
+    fig.show()
+
+
+def spectrogram_stft(
+    audio_data: np.ndarray,
+    sample_rate: int,
+    window_size: int,
+    hop_size: int,
+    title: Optional[str] = "Spectrogram (STFT)",
+    log_scale: bool = False,
+) -> None:
     """
     Plot the spectrogram of the audio signal using STFT and Plotly.
 
@@ -118,9 +185,39 @@ def spectrogram_stft(audio_data: np.ndarray, sample_rate: int, window_size: int,
         title (str, optional): Plot title
         log_scale (bool, optional): Whether to display the frequency axis in log scale
     """
-    times, frequencies, stft_magnitudes = STFT(audio_data, sample_rate, window_size, hop_size)
-    fig = px.imshow(20 * np.log10(stft_magnitudes), x=times, y=frequencies, origin='lower', aspect='auto', color_continuous_scale='viridis')
-    fig.update_layout(title=title, xaxis_title='Time (seconds)', yaxis_title='Frequency (Hz)')
-    if log_scale:
-        fig.update_yaxes(type='log')
-    fig.show()
+    times, frequencies, stft_magnitudes = STFT(
+        audio_data, sample_rate, window_size, hop_size
+    )
+    plot_spectrogram(times, frequencies, stft_magnitudes, title, log_scale)
+
+
+if __name__ == "__main__":
+    # Test the functions with a sample audio file
+    test_file_path = "data\\Task 1\\task1.wav"
+    output_file_path = "output_audio.wav"
+
+    # Load audio
+    audio_data, sample_rate = load_audio(test_file_path)
+
+    # Save audio
+    save_audio(output_file_path, audio_data, sample_rate)
+
+    # Visualize signal
+    visualize_signal(audio_data, sample_rate, title="Test Audio Signal")
+
+    # Visualize spectrum
+    visualize_spectrum(audio_data, sample_rate, title="Test Frequency Spectrum")
+
+    # Compute and visualize spectrogram
+    window_size = 1024
+    hop_size = 512
+    spectrogram_stft(
+        audio_data,
+        sample_rate,
+        window_size,
+        hop_size,
+        title="Test Spectrogram (STFT)",
+        log_scale=True,
+    )
+
+
