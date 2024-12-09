@@ -9,11 +9,11 @@ def f(arg1, arg2):
     Main purpose of function demonstration.
     
     Args:
-        arg1 (str): First argument description and assumptions
-        arg2 (int): Second argument description and assumptions
+        arg1 (type): First argument description and assumptions and and what is every dim (if has)
+        arg2 (type): Second argument description and assumptions and what is every dim (if has)
         
     Returns:
-        str: Description of what the function returns
+        type: Description of what the function returns, asuumptions, and what is every dim (if has)
         
     Raises:
         ValueError: If arg2 is negative
