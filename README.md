@@ -12,16 +12,18 @@ Implementation of audio watermarking techniques for detection and analysis.
 * [x] Plot audio spectrum in the frequency domain, `visualize_spectrum`
 * [x] Function that calculates the STFT of audio, `STFT`
 * [x] Function that plots the spectrogram of STFT, `spectrogram_stft`
+* [x] Plot spectrogram of audio signal, `plot_spectrogram`
 
 ### Task 1: Watermark Creation
-* [ ] Create inaudible but detectable watermark, `create_good_watermark`
-* [ ] Create audible watermark example, `create_bad_watermark`
-* [ ] Apply watermark to audio signal, `apply_watermark`
+* [x] Adding a wave to an array that represents audio should be possible, with the range of the addition being its frequency and intensity. , `add_wave`
+
 
 ### Task 2: Watermark Classification
-* [ ] Extract watermark from audio signal, `detect_watermark`
-* [ ] Group audio files by watermark type, `classify_watermarks`
-* [ ] Identify watermark creation function, `extract_watermark_function`
+* [x] Extract a range of frequencies from the audio signal and convert it back to a waveform, `waveform_from_frequency_range`
+* [x] Compute the Discrete Fourier Transform (DFT) of the extracted waveform within a specified frequency range, `dft_on_frequency_range`
+* [x] Filter the STFT magnitudes to retain only the specified frequency range, `extract_frequency_range`
+* [x] Classify an audio file based on the frequency of its watermark, `classify_by_frequency_watermark`
+
 
 ### Task 3: Audio Speedup Analysis
 * [ ] Check frequency domain modifications, `detect_frequency_modifications`
@@ -32,9 +34,7 @@ Implementation of audio watermarking techniques for detection and analysis.
 ## Detailed Task Description
 
 ### Task 1: Creating Watermarks
-**Goal**: Learn how to embed hidden information in audio while maintaining quality
-- Create two types of watermarks to understand the trade-off between detectability and perceptibility
-- Demonstrate how incorrect watermarking can degrade audio quality
+**Goal**:add watermark to audio, create good watermark and wrong watermark.
 - Practice frequency-domain signal manipulation
 
 ### Task 2: Watermark Classification
