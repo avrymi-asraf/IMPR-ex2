@@ -162,3 +162,5 @@ cython_debug/
 #.idea/
 *.ipynb
 .vscode/
+ex2.py
+image_out/
