@@ -164,3 +164,4 @@ cython_debug/
 .vscode/
 ex2.py
 image_out/
+*.tar
