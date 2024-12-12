@@ -142,28 +142,46 @@ def process_frequency_range(
     return wave_spectrum
 
 
-def classify_by_frequency_watermark(audio_path: str) -> int:
+def detect_watermark_frequency(audio_path: str) -> float:
     """
-    Classify an audio file based on the frequency of its watermark.
-
+    Detect and calculate the frequency of a watermark in an audio file, normalized by audio duration.
+    
     Args:
-        audio_path (str): Path to the audio file.
-
+        audio_path (str): Path to the audio file containing the watermark.
+        
     Returns:
-        int: Classification result based on the watermark frequency.
-             Returns 1 if the watermark frequency is in range 3-9,
-             2 if in range 10-14,
-             3 if in range 15-19,
-             -1 if not in any of these ranges.
+        float: Normalized watermark frequency value, calculated by dividing the peak 
+              frequency index (in range 5-20) by the audio duration in seconds.
     """
+    # Get audio duration
+    audio_data, sample_rate = load_audio(audio_path)
+    duration = len(audio_data) / sample_rate
+    
+    # Process frequency range
     high_wave_magnitude = process_frequency_range(
         audio_path, 2**15, (18_000, 21_000), (False, False, False)
     )
-    watermark_frequency = np.argmax(high_wave_magnitude[5:20])
-    if 4 <= watermark_frequency <= 8:
-        return 1
-    elif 9 <= watermark_frequency <= 12:
-        return 2
-    elif 13 <= watermark_frequency <= 16:
-        return 3
-    return -1
+    watermark_frequency = np.argmax(high_wave_magnitude[5:20])+5
+    
+    return watermark_frequency/duration
+
+
+def mean_watermark_frequency(file_paths: list[str]) -> float:
+    """
+    Calculate the mean watermark frequency across multiple audio files.
+    
+    Args:
+        file_paths (list[str]): List of paths to audio files to process
+        
+    Returns:
+        float: Mean watermark frequency across all provided files
+        
+    Raises:
+        ValueError: If file_paths is empty
+    """
+    if not file_paths:
+        raise ValueError("File paths list cannot be empty")
+        
+    frequencies = [detect_watermark_frequency(file_path) for file_path in file_paths]
+    return np.mean(frequencies)
+
